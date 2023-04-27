@@ -226,44 +226,6 @@ void reset(sandBox &sB)
     }
 }
 
-/*
-void etatSuivant(JeuDeLaVie &jeu)
-{
-JeuDeLaVie jeu2;
-jeu2=jeu;
-for (int i = 1 ; i<jeu.dx-1 ; i++)
-{
-for(int j=1;j<jeu.dy-1;j++)
-{
-int nbVoisin=0;
-for(int x=i-1;x<=i+1;x++)
-{
-for(int y=j-1;y<=j+1;y++)
-{
-if (jeu2.grille[x][y] && !(x==i && y==j))
-{
-nbVoisin++;
-//cout<<x<<" / "<<y<<endl;
-}
-}
-}
-//cout << nbVoisin << endl;
-if(jeu.grille[i][j] && (nbVoisin==2||nbVoisin==3))
-{
-jeu.grille[i][j]=1;
-
-}else if(!jeu.grille[i][j] && nbVoisin==3)
-{
-jeu.grille[i][j]=1;
-}else if (nbVoisin<=1 || nbVoisin>=4)
-{
-jeu.grille[i][j]=0;
-}
-}
-}
-}*/
-
-
 const int pileFace=irand(0,1);
 
 void sbUpdateSand(sandBox &sB, int i, int j)
@@ -304,41 +266,42 @@ void sbUpdateSand(sandBox &sB, int i, int j)
 
             if (pileFace == 0)
             {
-                if(verif[1][-1]==true)
-                {
+                //if(verif[1][-1]==true)
+                //{
                     sB.grille[i + 1][j - 1] = SAND;
                     sB.grille[i][j] = VIDE;
-                }
+                //}
                // std::cout<<pileFace<<endl;
             }
             else
             {
-                if(verif[-1][-1]==true)
-                {
+                //if(verif[-1][-1]==true)
+                //{
                     sB.grille[i - 1][j - 1] = SAND;
                     sB.grille[i][j] = VIDE;
-                }
+                //}
                // std::cout<<pileFace<<endl;
             }
 
         }
         else if (basGauche != VIDE && basDroite == VIDE)
         {
-            if(verif[1][-1]==true)
-            {
+            //if(verif[1][-1]==true)
+            //{
                 sB.grille[i][j] = VIDE;
                 sB.grille[i + 1][j - 1] = SAND;
-            }
+            //}
         }
-        else if (basGauche == VIDE && basDroite != VIDE && i >= 1 && j >= 0 && i < sB.dx && j < sB.dy) // probleme ici !!!!
+        else if (basGauche == VIDE && basDroite != VIDE && i >= 1 && j >= 0 && i < sB.dx && j < sB.dy )
         {
-            if(verif[-1][-1]==true)
-            {
+            //if(verif[-1][-1]==true)
+            //{
                 std::cout<<"ok"<<endl;
                 sB.grille[i][j] = VIDE;
                 sB.grille[i - 1][j - 1] = SAND;
-            }
+            //}
         }
+
 
     }
 }
@@ -633,4 +596,3 @@ int main(int, char **)
     winQuit();
     return 0;
 }
-
