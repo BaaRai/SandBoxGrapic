@@ -13,9 +13,9 @@ const int VIDE = 0;
 const int PLEIN = 1;
 const int SAND=2;
 const int WATER=3;
-const float SW=3.5;
-const int WALL=4;
-const int GAS=5;
+const int SW=4;
+const int WALL=5;
+const int GAS=6;
 const float FRICTION = 0.8;
 const float dt = 0.001;
 const int MAX_PART = 100;
@@ -184,6 +184,33 @@ void etatInitial(sandBox &sB)
     sB.alive = 0;
 }
 
+
+
+void rectangleCell(sandBox &sB, int xm, int ym, int xM, int yM, int type)
+{
+    for(int i=xm; i<=xM; i++)
+    {
+        for(int j=ym; j<=yM; j++)
+        {
+            sB.grille[i][j]=type;
+        }
+    }
+}
+
+void bordure (sandBox &sB)
+{
+    for(int i=0; i<sB.dx; i++)
+    {
+        for(int j=0; j<sB.dy; j++)
+        {
+            rectangleCell(sB,0,i,j,0,WALL);// bas
+            rectangleCell(sB,sB.dx-1,i,j,sB.dy-1,WALL);// droite
+            rectangleCell(sB,i,sB.dx-1,j,sB.dy-1,WALL); // haut
+            rectangleCell(sB,i,0,0,j,WALL);   //gauche
+        }
+    }
+}
+
 void gestionSouris(sandBox &sB, int type)
 {
     if (isMousePressed(SDL_BUTTON_LEFT))
@@ -217,9 +244,9 @@ void reset(sandBox &sB)
 
     if(isKeyPressed('r'))
     {
-        for (int i = 0; i < sB.dx; i++)
+        for (int i = 1; i < sB.dx-1; i++)
         {
-            for (int j = 0; j <sB.dy; j++)
+            for (int j = 1; j <sB.dy-1; j++)
             {
                 sB.grille[i][j]=VIDE;
             }
@@ -307,6 +334,7 @@ void sbUpdateSand(sandBox &sB, int i, int j)
 
     }
 }
+
 
 
 void sbUpdateWater(sandBox &sB, int i, int j)
@@ -459,6 +487,7 @@ void sbUpdateGas(sandBox &sB, int i, int j)
 
 
 
+
 void sbUpdate(sandBox &sB)
 {
     for (int i = 0; i < sB.dx; i++)
@@ -492,8 +521,8 @@ void sbUpdate(sandBox &sB)
 
 //BIZARRE ????? cest pas ca quil faut pour le gaz a upgrade !!!!
 
-//distance minimal entre eau et sable 1 et pour tout le reste
-void changement (sandBox &sB, int i, int j)
+//distance minimal entre eau et sable 1 et pour tout le reste (pour interpolation bizarre qd meme)
+/*void changement (sandBox &sB, int i, int j)
 {
     int centre = sB.grille[i][j];
     int droite = sB.grille[i+1][j];
@@ -582,10 +611,10 @@ void changement (sandBox &sB, int i, int j)
             sB.grille[i-1][j]=WATER;
         }
     }
-    
+
 
 }
-
+*/
 void draw (sandBox &sB)
 {
     int i, j;
@@ -623,82 +652,6 @@ void draw (sandBox &sB)
 }
 
 
-/*void drawSand(sandBox &sB)
-{
-
-                // rectangleFill(i*tailleX,j*tailleY,(i+1)*tailleX,(j+1)*tailleY);
-                // pour mur
-            }
-        }
-    }
-}
-
-void drawWater(sandBox &sB)
-{
-    int i, j;
-    grid(0, 0, DIMW - 1, DIMW - 1, sB.dx, sB.dy);
-    int tailleX = DIMW / sB.dx;
-    int tailleY = DIMW / sB.dy;
-    for (i = 0; i < sB.dx; i++)
-    {
-        for (j = 0; j < sB.dy; j++)
-        {
-            if (sB.grille[i][j])
-            {
-                color(50, 0, 255);
-                circleFill(i * tailleX + tailleX / 14, j * tailleY + tailleY / 2,tailleX / 2-2);
-                // rectangleFill(i*tailleX,j*tailleY,(i+1)*tailleX,(j+1)*tailleY);
-                // pour mur
-            }
-        }
-    }
-}
-
-
-
-void drawMur(sandBox &sB)
-{
-    int i, j;
-
-    int tailleX = DIMW / sB.dx;
-    int tailleY = DIMW / sB.dy;
-    for (i = 0; i < sB.dx; i++)
-    {
-        for (j = 0; j < sB.dy; j++)
-        {
-            if (sB.grille[i][j])
-            {
-                color(220,28,220);
-                rectangleFill(i*tailleX,j*tailleY,(i+1)*tailleX,(j+1)*tailleY);
-                //circleFill(i * tailleX + tailleX / 2, j * tailleY + tailleY / 2,tailleX / 2-2);
-            }
-        }
-    }
-}
-
-
-void drawGaz(sandBox &sB)
-{
-    int i, j;
-    grid(0, 0, DIMW - 1, DIMW - 1, sB.dx, sB.dy);
-    int tailleX = DIMW / sB.dx;
-    int tailleY = DIMW / sB.dy;
-    for (i = 0; i < sB.dx; i++)
-    {
-        for (j = 0; j < sB.dy; j++)
-        {
-            if (sB.grille[i][j])
-            {
-                color(199, 176, 24);
-                circleFill(i * tailleX + tailleX / 2, j * tailleY + tailleY / 2,tailleX / 2-2);
-                // rectangleFill(i*tailleX,j*tailleY,(i+1)*tailleX,(j+1)*tailleY);
-                // pour mur
-            }
-        }
-    }
-}
-*/
-
 int main(int, char **)
 {
     winInit("SandBox", 500,500);
@@ -712,6 +665,7 @@ int main(int, char **)
     menu_add(menu,"Gas");
     sandBox sB;
     Init(sB);
+    bordure(sB);
     int type=SAND;
     //etatInitial(sB); utile ?
     while (!stop)
