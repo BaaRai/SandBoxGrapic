@@ -10,6 +10,7 @@ using namespace grapic;
 const int MAX = 100;
 const int DIMW = 500;
 const int VIDE = 0;
+const int ACID= 10;
 const int PLEIN = 1;
 const int SAND=2;
 const int WATER=3;
@@ -336,6 +337,112 @@ void sbUpdateSand(sandBox &sB, int i, int j)
 }
 
 
+void sbUpdateAcid (sandBox &sB, int i, int j)
+{
+    int centre = sB.grille[i][j];
+    int droite = sB.grille[i+1][j];
+    int gauche = sB.grille[i-1][j];
+    int bas = sB.grille[i][j-1];
+    int basGauche = sB.grille[i - 1][j - 1];
+    int basDroite = sB.grille[i + 1][j - 1];
+    int haut = sB.grille[i][j+1];
+    bool verif[3][3];
+    for(int k=0; k<3;k++)
+    {
+        for (int l=0 ; l<3;l++)
+        {
+            verif[k][l]=true;
+        }
+    }
+    if (centre != VIDE && bas == VIDE)
+    {
+        sB.grille[i][j] = VIDE;
+        sB.grille[i][j - 1] = ACID;
+    }
+    else if (centre != VIDE && bas != VIDE)
+    {
+        if (bas ==WALL && gauche ==WALL)
+        {
+            verif[0][0]=false;
+        }
+        if(droite== WALL && bas==WALL)
+        {
+            sB.grille[i][j]=ACID;
+            verif[2][0]=false;
+        }
+        if(bas==SAND && droite==SAND)
+        {
+            sB.grille[i][j-1]=ACID;
+            sB.grille[i][j] = VIDE;
+
+        }
+        if(bas==ACID && droite==SAND)
+        {
+            sB.grille[i+1][j]=ACID;
+            sB.grille[i][j]=VIDE;
+        }
+        if(haut==SAND && bas == ACID)
+        {
+            sB.grille[i][j+1]=ACID;
+            sB.grille[i][j]=VIDE;
+        }
+        if(gauche==ACID && droite==SAND)
+        {
+            sB.grille[i+1][j]=ACID;
+            sB.grille[i][j]=VIDE;
+        }
+        if(gauche==SAND && droite==ACID)
+        {
+            sB.grille[i-1][j]=ACID;
+            sB.grille[i][j]=VIDE;
+        }
+        if (basGauche == VIDE && basDroite == VIDE)
+        {
+
+            if (pileFace == 0)
+            {
+                if(verif[2][0]==true)
+                {
+                   // std::cout<<"ok"<<endl;
+                    sB.grille[i + 1][j - 1] = ACID;
+                    sB.grille[i][j] = VIDE;
+                }
+                //std::cout<<pileFace<<endl;
+            }
+            else
+            {
+                if(verif[0][0]==true)
+                {
+                    //std::cout<<"ok"<<endl;
+                    sB.grille[i - 1][j - 1] = ACID;
+                    sB.grille[i][j] = VIDE;
+                }
+                //std::cout<<pileFace<<endl;
+            }
+
+        }
+        else if (basGauche != VIDE && basDroite == VIDE)
+        {
+            if(verif[2][0]==true)
+            {
+                //std::cout<<"ok"<<endl;
+                sB.grille[i][j] = VIDE;
+                sB.grille[i + 1][j - 1] = ACID;
+            }
+        }
+        else if (basGauche == VIDE && basDroite != VIDE )
+        {
+            if(verif[0][0]==true)
+            {
+               // std::cout<<"ok"<<endl;
+                sB.grille[i][j] = VIDE;
+                sB.grille[i - 1][j - 1] = ACID;
+            }
+        }
+
+    }
+}
+
 
 void sbUpdateWater(sandBox &sB, int i, int j)
 {
@@ -346,6 +453,7 @@ void sbUpdateWater(sandBox &sB, int i, int j)
     int bas = sB.grille[i][j-1];
     int basGauche = sB.grille[i - 1][j - 1];
     int basDroite = sB.grille[i + 1][j - 1];
+    int haut = sB.grille[i][j+1];
     bool verif[3][3];
     for(int k=0; k<3;k++)
     {
@@ -512,6 +620,10 @@ void sbUpdate(sandBox &sB)
                 {
                     sbUpdateGas(sB,i,j);
                 }
+                else if(sB.grille[i][j]==ACID)
+                {
+                    sbUpdateAcid(sB,i,j);
+                }
 
             }
         }
@@ -646,6 +758,11 @@ void draw (sandBox &sB)
                 color(199, 176, 24);
                 circleFill(i * tailleX + tailleX / 2, j * tailleY + tailleY / 2,tailleX / 2-2);
             }
+            else if (sB.grille[i][j]==ACID)
+            {
+                color(255, 255, 5);
+                circleFill(i * tailleX + tailleX / 2, j * tailleY + tailleY / 2,tailleX / 2-2);
+            }
 
         }
     }
@@ -662,6 +779,7 @@ int main(int, char **)
     menu_add(menu,"Sand");
     menu_add(menu,"Wall");
     menu_add(menu,"Water");
+    menu_add(menu,"Acid");
     menu_add(menu,"Gas");
     sandBox sB;
     Init(sB);
@@ -683,7 +801,7 @@ int main(int, char **)
         case 0:
             type=SAND;
             //inMenu = true;
-            //delay(50);
+            delay(50);
             break;
         case 1:
             type=WALL;
@@ -693,6 +811,10 @@ int main(int, char **)
         case 2:
             //inMenu = true;
            type=WATER;
+            break;
+        case 3:
+            type=ACID;
+            delay(50);
             break;
             /*case 3:
                 drawGaz(sB);
