@@ -801,7 +801,7 @@ int main(int, char **)
         case 0:
             type=SAND;
             //inMenu = true;
-            delay(50);
+            //delay(50);
             break;
         case 1:
             type=WALL;
@@ -814,7 +814,7 @@ int main(int, char **)
             break;
         case 3:
             type=ACID;
-            delay(50);
+            //delay(50);
             break;
             /*case 3:
                 drawGaz(sB);
