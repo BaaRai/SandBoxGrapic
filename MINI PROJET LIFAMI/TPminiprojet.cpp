@@ -800,7 +800,7 @@ int main(int, char **)
     menu_add(menu,"Wall");
     menu_add(menu,"Water");
     menu_add(menu,"Acid");
-    menu_add(menu,"Gas");
+    menu_add(menu,"Gaz");
     sandBox sB;
     Init(sB);
     bordure(sB);
@@ -836,10 +836,9 @@ int main(int, char **)
             type=ACID;
             //delay(50);
             break;
-            /*case 3:
-                drawGaz(sB);
-                sbUpdateGaz(sB);
-                break;*/
+        case 4:
+            type=GAS;
+            break;
 
         }
         //if(!inMenu)
