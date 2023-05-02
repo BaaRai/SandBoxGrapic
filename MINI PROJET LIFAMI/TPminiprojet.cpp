@@ -434,19 +434,39 @@ void sbUpdateAcid (sandBox &sB, int i, int j)
         {
             if(verif[0][0]==true)
             {
-               // std::cout<<"ok"<<endl;
+                std::cout<<"ok"<<endl;
                 sB.grille[i][j] = VIDE;
                 sB.grille[i - 1][j - 1] = ACID;
             }
         }
-
+        else if (gauche ==  VIDE && droite ==  VIDE )
+        {
+            if (pileFace == 0)
+            {
+                sB.grille[i+1][j]=ACID;
+            }
+            else
+            {
+                sB.grille[i-1][j]=ACID;
+            }
+            sB.grille[i][j] = VIDE;
+        }
+        else if (gauche !=VIDE && droite== VIDE)
+        {
+            sB.grille[i][j]=VIDE;
+            sB.grille[i+1][j]=ACID;
+        }
+        else if(gauche==VIDE && droite!=VIDE )
+        {
+            sB.grille[i][j]=VIDE;
+            sB.grille[i-1][j]=ACID;
+        }
     }
 }
 
 
 void sbUpdateWater(sandBox &sB, int i, int j)
 {
-
     int centre = sB.grille[i][j];
     int droite = sB.grille[i+1][j];
     int gauche = sB.grille[i-1][j];
