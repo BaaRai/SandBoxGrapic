@@ -13,7 +13,6 @@ const int VIDE = 0;
 const int PLEIN = 1;
 const int SAND=2;
 const int WATER=3;
-const int SW=4;
 const int WALL=5;
 const int ACID= 6;
 const int GAS=7;
@@ -25,7 +24,7 @@ struct sandBox
 {
     int grille[MAX][MAX];
     int dx, dy;
-    int alive;
+    Image quitter;
 };
 
 struct vec2
@@ -177,13 +176,8 @@ void Init(sandBox &sB)
             sB.grille[i][j] = VIDE;
         }
     }
-    sB.alive = VIDE;
 }
 
-void etatInitial(sandBox &sB)
-{
-    sB.alive = 0;
-}
 
 
 
@@ -224,8 +218,9 @@ void gestionSouris(sandBox &sB, int type)
         x = x / largeur;
         y = y / hauteur;
         vec2 souris=makevec2(x,y);
-        sB.grille[x][y] =type;
+        sB.grille[x][y]=type;
     }
+
     if(isMousePressed(SDL_BUTTON_RIGHT))
     {
         int x, y;
@@ -266,9 +261,9 @@ void sbUpdateSand(sandBox &sB, int i, int j)
     int basGauche = sB.grille[i - 1][j - 1];
     int basDroite = sB.grille[i + 1][j - 1];
     bool verif[3][3];
-    for(int k=0; k<3;k++)
+    for(int k=0; k<3; k++)
     {
-        for (int l=0 ; l<3;l++)
+        for (int l=0 ; l<3; l++)
         {
             verif[k][l]=true;
         }
@@ -278,10 +273,16 @@ void sbUpdateSand(sandBox &sB, int i, int j)
         sB.grille[i][j] = VIDE;
         sB.grille[i][j - 1] = SAND;
     }
+    if(bas == WATER )
+    {
+        sB.grille[i][j]=WATER;
+        sB.grille[i][j-1]=SAND;
+    }
     else if (centre != VIDE && bas != VIDE)
     {
         if (bas ==WALL && gauche ==WALL)
         {
+            sB.grille[i][j]=SAND;
             verif[0][0]=false;
         }
         if(droite== WALL && bas==WALL)
@@ -296,7 +297,7 @@ void sbUpdateSand(sandBox &sB, int i, int j)
             {
                 if(verif[2][0]==true)
                 {
-                   // std::cout<<"ok"<<endl;
+                    // std::cout<<"ok"<<endl;
                     sB.grille[i + 1][j - 1] = SAND;
                     sB.grille[i][j] = VIDE;
                 }
@@ -327,7 +328,7 @@ void sbUpdateSand(sandBox &sB, int i, int j)
         {
             if(verif[0][0]==true)
             {
-               // std::cout<<"ok"<<endl;
+                // std::cout<<"ok"<<endl;
                 sB.grille[i][j] = VIDE;
                 sB.grille[i - 1][j - 1] = SAND;
             }
@@ -346,9 +347,9 @@ void sbUpdateWater(sandBox &sB, int i, int j)
     int basDroite = sB.grille[i + 1][j - 1];
     int haut = sB.grille[i][j+1];
     bool verif[3][3];
-    for(int k=0; k<3;k++)
+    for(int k=0; k<3; k++)
     {
-        for (int l=0 ; l<3;l++)
+        for (int l=0 ; l<3; l++)
         {
             verif[k][l]=true;
         }
@@ -376,7 +377,7 @@ void sbUpdateWater(sandBox &sB, int i, int j)
             {
                 if(verif[2][0]==true)
                 {
-                   // std::cout<<"ok"<<endl;
+                    // std::cout<<"ok"<<endl;
                     sB.grille[i + 1][j - 1] = WATER;
                     sB.grille[i][j] = VIDE;
                 }
@@ -437,85 +438,6 @@ void sbUpdateWater(sandBox &sB, int i, int j)
 }
 
 
-void sbUpdateSW(sandBox &sB, int i, int j)
-{
-    int centre = sB.grille[i][j];
-    int droite = sB.grille[i+1][j];
-    int gauche = sB.grille[i-1][j];
-    int bas = sB.grille[i][j-1];
-    int basGauche = sB.grille[i - 1][j - 1];
-    int basDroite = sB.grille[i + 1][j - 1];
-    bool verif[3][3];
-    for(int k=0; k<3;k++)
-    {
-        for (int l=0 ; l<3;l++)
-        {
-            verif[k][l]=true;
-        }
-    }
-    if (centre == SAND && bas == WATER)
-    {
-        sB.grille[i][j] = SW;
-    }
-    /*else if (centre != VIDE && bas != VIDE)
-    {
-        if (bas ==WALL && gauche ==WALL)
-        {
-            verif[0][0]=false;
-        }
-        if(droite== WALL && bas==WALL)
-        {
-            sB.grille[i][j]=SAND;
-            verif[2][0]=false;
-        }
-        if (basGauche == VIDE && basDroite == VIDE)
-        {
-
-            if (pileFace == 0)
-            {
-                if(verif[2][0]==true)
-                {
-                   // std::cout<<"ok"<<endl;
-                    sB.grille[i + 1][j - 1] = SAND;
-                    sB.grille[i][j] = VIDE;
-                }
-                //std::cout<<pileFace<<endl;
-            }
-            else
-            {
-                if(verif[0][0]==true)
-                {
-                    //std::cout<<"ok"<<endl;
-                    sB.grille[i - 1][j - 1] = SAND;
-                    sB.grille[i][j] = VIDE;
-                }
-                //std::cout<<pileFace<<endl;
-            }
-
-        }
-        else if (basGauche != VIDE && basDroite == VIDE)
-        {
-            if(verif[2][0]==true)
-            {
-                //std::cout<<"ok"<<endl;
-                sB.grille[i][j] = VIDE;
-                sB.grille[i + 1][j - 1] = SAND;
-            }
-        }
-        else if (basGauche == VIDE && basDroite != VIDE )
-        {
-            if(verif[0][0]==true)
-            {
-               // std::cout<<"ok"<<endl;
-                sB.grille[i][j] = VIDE;
-                sB.grille[i - 1][j - 1] = SAND;
-            }
-        }
-
-    }*/
-}
-
-
 void sbUpdateMur(sandBox &sB, int i, int j)
 {
     for (int i = 0; i < sB.dx; i++)
@@ -548,9 +470,9 @@ void sbUpdateAcid (sandBox &sB, int i, int j)
     int basDroite = sB.grille[i + 1][j - 1];
     int haut = sB.grille[i][j+1];
     bool verif[3][3];
-    for(int k=0; k<3;k++)
+    for(int k=0; k<3; k++)
     {
-        for (int l=0 ; l<3;l++)
+        for (int l=0 ; l<3; l++)
         {
             verif[k][l]=true;
         }
@@ -604,7 +526,7 @@ void sbUpdateAcid (sandBox &sB, int i, int j)
             {
                 if(verif[2][0]==true)
                 {
-                   // std::cout<<"ok"<<endl;
+                    // std::cout<<"ok"<<endl;
                     sB.grille[i + 1][j - 1] = ACID;
                     sB.grille[i][j] = VIDE;
                 }
@@ -706,10 +628,6 @@ void sbUpdate(sandBox &sB)
                 else if(sB.grille[i][j]==WATER)
                 {
                     sbUpdateWater(sB,i,j);
-                }
-                else if(sB.grille[i][j]==SW)
-                {
-                    sbUpdateSW(sB,i,j);
                 }
                 else if(sB.grille[i][j]==WALL)
                 {
@@ -852,11 +770,6 @@ void draw (sandBox &sB)
                 circleFill(i * tailleX + tailleX / 2, j * tailleY + tailleY / 2,tailleX / 2-2);
                 //circleFill(i * tailleX + tailleX / 14, j * tailleY + tailleY / 2,tailleX / 2-2); plus petit cercle (rayon)
             }
-            else if(sB.grille[i][j]==SW)
-            {
-                color(199, 123, 24);
-                circleFill(i * tailleX + tailleX / 2, j * tailleY + tailleY / 2,tailleX / 2-2);
-            }
             else if(sB.grille[i][j]==GAS)
             {
                 color(199, 176, 24);
@@ -871,7 +784,6 @@ void draw (sandBox &sB)
         }
     }
 }
-
 
 int main(int, char **)
 {
@@ -889,51 +801,56 @@ int main(int, char **)
     Init(sB);
     bordure(sB);
     int type=SAND;
-    //etatInitial(sB); utile ?
-    while (!stop)
+    int choice;
+    cout<<"0. quit"<<endl;
+    cout<<"1. Play Game"<<endl;
+    cin>>choice;
+    switch(choice)
     {
-        setKeyRepeatMode(true);
-        winClear();
-        sbUpdate(sB);
-        draw(sB);
-        reset(sB);
-        //std::cout<<menu_select(menu)<<endl;
-       // bool inMenu = false;
-        switch (menu_select(menu) )
+    case 0:
+        cout<<"bye"<<endl;
+        break;
+    case 1:
+        while (!stop)
         {
+            setKeyRepeatMode(true);
+            winClear();
+            sbUpdate(sB);
+            draw(sB);
+            reset(sB);
+            //std::cout<<menu_select(menu)<<endl;
+            // bool inMenu = false;
+            switch (menu_select(menu) )
+            {
 
-        case 0:
-            type=SAND;
-            //inMenu = true;
-            //delay(50);
-            break;
-        case 1:
-            type=WALL;
-            //inMenu = true;
-            //delay(50);
-            break;
-        case 2:
-            //inMenu = true;
-           type=WATER;
-            break;
-        case 3:
-            type=ACID;
-            //delay(50);
-            break;
-        case 4:
-            type=GAS;
-            break;
+            case 0:
+                type=SAND;
+                //inMenu = true;
+                //delay(50);
+                break;
+            case 1:
+                type=WALL;
+                //inMenu = true;
+                //delay(50);
+                break;
+            case 2:
+                //inMenu = true;
+                type=WATER;
+                break;
+            case 3:
+                type=ACID;
+                //delay(50);
+                break;
+            case 4:
+                type=GAS;
+                break;
 
-        }
-        //if(!inMenu)
-        //{
+            }
             gestionSouris(sB,type);
-
-        //}
-
-        menu_draw(menu,5,5,-1,-1);
-        stop = winDisplay();
-
+            menu_draw(menu,5,5,-1,-1);
+            stop = winDisplay();
+        }
+        break;
     }
     winQuit();
     return 0;
