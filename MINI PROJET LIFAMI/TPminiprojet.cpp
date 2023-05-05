@@ -479,13 +479,43 @@ void sbUpdateAcid (sandBox &sB, int i, int j)
     }*/
     if(droite==SAND)
     {
-        sB.grille[i+1][j]=ACID;
+        sB.grille[i+1][j]=VIDE;
         sB.grille[i][j] = VIDE;
     }
     if(bas==SAND)
     {
-         sB.grille[i][j-1]=ACID;
+         sB.grille[i][j-1]=VIDE;
          sB.grille[i][j] = VIDE;
+    }
+    if (gauche==SAND)
+    {
+        sB.grille[i-1][j]=VIDE;
+        sB.grille[i][j] = VIDE;
+    }
+    if(haut==SAND)
+    {
+        sB.grille[i][j+1]=VIDE;
+        sB.grille[i][j] = ACID;
+    }
+    if(droite==PLANT)
+    {
+        sB.grille[i+1][j]=VIDE;
+        sB.grille[i][j] = VIDE;
+    }
+    if(bas==PLANT)
+    {
+         sB.grille[i][j-1]=VIDE;
+         sB.grille[i][j] = VIDE;
+    }
+    if (gauche==PLANT)
+    {
+        sB.grille[i-1][j]=VIDE;
+        sB.grille[i][j] = VIDE;
+    }
+    if(haut==PLANT)
+    {
+        sB.grille[i][j+1]=VIDE;
+        sB.grille[i][j] = ACID;
     }
     /*if(bas==ACID && droite==SAND)
     {
@@ -635,6 +665,11 @@ void sbUpdatePlant(sandBox &sB, int i, int j)
     if(haut==WATER)
     {
         sB.grille[i][j+1]=PLANT;
+        sB.grille[i][j] = VIDE;
+    }
+    if(bas==WATER)
+    {
+        sB.grille[i][j-1]=PLANT;
         sB.grille[i][j] = VIDE;
     }
     /*if(droite==SAND)
