@@ -26,6 +26,7 @@ struct sandBox
     int grille[MAX][MAX];
     int dx, dy;
     Image quitter;
+    Image vortex;
 };
 
 struct vec2
@@ -177,6 +178,7 @@ void Init(sandBox &sB)
             sB.grille[i][j] = VIDE;
         }
     }
+    //sB.vortex=image("data/vortex.png");
 }
 
 
@@ -362,6 +364,12 @@ void sbUpdateWater(sandBox &sB, int i, int j)
         sB.grille[i][j] = VIDE;
         sB.grille[i][j - 1] = WATER;
     }
+    if(bas==ACID)
+    {
+        sB.grille[i][j] = VIDE;
+        sB.grille[i][j-1]=VIDE;
+    }
+
     else if (centre != VIDE && bas != VIDE)
     {
         if (bas ==WALL && gauche ==WALL)
@@ -406,33 +414,35 @@ void sbUpdateWater(sandBox &sB, int i, int j)
                 sB.grille[i + 1][j - 1] = WATER;
             }
         }
-        else if (basGauche == VIDE && basDroite != VIDE )
+        else if (basGauche != VIDE && basDroite == VIDE )
         {
             if(verif[0][0]==true)
             {
                 std::cout<<"ok"<<endl;
                 sB.grille[i][j] = VIDE;
-                sB.grille[i - 1][j - 1] = WATER;
-            }
+                sB.grille[i + 1][j - 1] = WATER;
+                }
         }
         else if (gauche ==  VIDE && droite ==  VIDE )
         {
             if (pileFace == 0)
             {
                 sB.grille[i+1][j]=WATER;
+                sB.grille[i][j] = VIDE;
             }
             else
             {
                 sB.grille[i-1][j]=WATER;
+                sB.grille[i][j] = VIDE;
             }
-            sB.grille[i][j] = VIDE;
+            //sB.grille[i][j] = VIDE;
         }
         else if (gauche !=VIDE && droite== VIDE)
         {
             sB.grille[i][j]=VIDE;
             sB.grille[i+1][j]=WATER;
         }
-        else if(gauche==VIDE && droite!=VIDE )
+        else if(gauche==VIDE && droite!=VIDE)
         {
             sB.grille[i][j]=VIDE;
             sB.grille[i-1][j]=WATER;
@@ -477,6 +487,11 @@ void sbUpdateAcid (sandBox &sB, int i, int j)
         sB.grille[i][j+1]=ACID;
         sB.grille[i][j] = VIDE;
     }*/
+    if(bas==WATER)
+    {
+        sB.grille[i][j] = VIDE;
+        sB.grille[i][j-1]=VIDE;
+    }
     if(droite==SAND)
     {
         sB.grille[i+1][j]=VIDE;
@@ -616,28 +631,33 @@ void sbUpdateAcid (sandBox &sB, int i, int j)
     }
 }
 
+
+const int aleagas=irand(0,8);
+
 void sbUpdateGas(sandBox &sB, int i, int j)
 {
-    for (int i = 0; i < sB.dx; i++)
+    int hautGauche=sB.grille[i-1][j+1];
+    int haut =sB.grille[i][j+1];
+    int hautDroite = sB.grille[i + 1][j + 1];
+    int gauche = sB.grille[i-1][j];
+    int droite = sB.grille[i+1][j];
+    int centre = sB.grille[i][j];
+    int basGauche = sB.grille[i - 1][j - 1];
+    int bas = sB.grille[i][j-1];
+    int basDroite = sB.grille[i + 1][j - 1];
+    bool verif[3][3];
+    for(int k=0; k<3; k++)
     {
-        for (int j = 0; j <sB.dy; j++)
+        for (int l=0 ; l<3; l++)
         {
-
-            {
-                int centre = sB.grille[i][j];
-                int centreHaut = sB.grille[i][j+1];
-                int gaucheHaut = sB.grille[i - 1][j + 1];
-                int droiteHaut = sB.grille[i + 1][j + 1];
-                if(centre==VIDE && centreHaut==PLEIN)
-                {
-                    sB.grille[i][j]=VIDE;
-                    sB.grille[i][j+1]=PLEIN;
-                    //sB.grille[i][j+1]=PLEIN;
-                }
-            }
+            verif[k][l]=true;
         }
     }
+    //if(c)
+
 }
+
+
 
 
 void sbUpdatePlant(sandBox &sB, int i, int j)
@@ -844,17 +864,17 @@ void draw (sandBox &sB)
             {
                 color(50, 0, 255);
                 circleFill(i * tailleX + tailleX / 2, j * tailleY + tailleY / 2,tailleX / 2-2);
-                //circleFill(i * tailleX + tailleX / 14, j * tailleY + tailleY / 2,tailleX / 2-2); plus petit cercle (rayon)
             }
             else if(sB.grille[i][j]==GAS)
             {
-                color(199, 176, 24);
+                color(242, 224, 174);
                 circleFill(i * tailleX + tailleX / 2, j * tailleY + tailleY / 2,tailleX / 2-2);
             }
             else if (sB.grille[i][j]==ACID)
             {
                 color(255, 255, 5);
                 circleFill(i * tailleX + tailleX / 2, j * tailleY + tailleY / 2,tailleX / 2-2);
+                //image_draw(sB.vortex,i * tailleX + tailleX / 2,j * tailleY + tailleY / 2,20,20);
             }
             else if(sB.grille[i][j]==PLANT)
             {
@@ -870,7 +890,7 @@ int main(int, char **)
 {
     winInit("SandBox", 500,500);
     bool stop = false;
-    backgroundColor(255);
+    backgroundColor(0,0,0);
     srand(time(NULL));
     Menu menu;
     menu_add(menu,"Sand");
@@ -916,8 +936,8 @@ int main(int, char **)
                 //delay(50);
                 break;
             case 2:
-                //inMenu = true;
                 type=WATER;
+                //delay(50);
                 break;
             case 3:
                 type=ACID;
