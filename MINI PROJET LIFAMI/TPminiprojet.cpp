@@ -15,7 +15,7 @@ const int SAND=2;
 const int WATER=3;
 const int WALL=5;
 const int ACID= 6;
-const int PLANT=7;
+const int CACTUS=7;
 const int GAS=8;
 const float FRICTION = 0.8;
 const float dt = 0.001;
@@ -339,7 +339,7 @@ void sbUpdateSand(sandBox &sB, int i, int j)
 
     }
 }
-const int pileFace=irand(0,1);
+
 void sbUpdateWater(sandBox &sB, int i, int j)
 {
     int centre = sB.grille[i][j];
@@ -520,22 +520,22 @@ void sbUpdateAcid (sandBox &sB, int i, int j)
         sB.grille[i][j] = VIDE;
         sB.grille[i][j-1]=VIDE;
     }
-    if(droite==PLANT)
+    if(droite==CACTUS)
     {
         sB.grille[i+1][j]=VIDE;
         sB.grille[i][j] = VIDE;
     }
-    if(bas==PLANT)
+    if(bas==CACTUS)
     {
          sB.grille[i][j-1]=VIDE;
          sB.grille[i][j] = VIDE;
     }
-    if (gauche==PLANT)
+    if (gauche==CACTUS)
     {
         sB.grille[i-1][j]=VIDE;
         sB.grille[i][j] = VIDE;
     }
-    if(haut==PLANT)
+    if(haut==CACTUS)
     {
         sB.grille[i][j+1]=VIDE;
         sB.grille[i][j] = ACID;
@@ -643,13 +643,18 @@ void sbUpdateGas(sandBox &sB, int i, int j)
             verif[k][l]=true;
         }
     }
-    //if(c)
+    if (centre != VIDE && haut == VIDE)
+    {
+        sB.grille[i][j] = VIDE;
+        sB.grille[i][j + 1] = GAS;
+    }
+
 
 }
 
 
 
-void sbUpdatePlant(sandBox &sB, int i, int j)
+void sbUpdateCACTUS(sandBox &sB, int i, int j)
 {
     int centre = sB.grille[i][j];
     int droite = sB.grille[i+1][j];
@@ -658,6 +663,8 @@ void sbUpdatePlant(sandBox &sB, int i, int j)
     int basGauche = sB.grille[i - 1][j - 1];
     int basDroite = sB.grille[i + 1][j - 1];
     int haut = sB.grille[i][j+1];
+    int hautGauche=sB.grille[i-1][j+1];
+    int hautDroite = sB.grille[i + 1][j + 1];
     bool verif[3][3];
     for(int k=0; k<3; k++)
     {
@@ -669,22 +676,17 @@ void sbUpdatePlant(sandBox &sB, int i, int j)
     if (centre != VIDE && bas == VIDE)
     {
         sB.grille[i][j] = VIDE;
-        sB.grille[i][j - 1] = PLANT;
+        sB.grille[i][j - 1] = CACTUS;
     }
-    if(haut==WATER)
+    if (centre != WATER && bas == WATER)
     {
-        sB.grille[i][j+1]=PLANT;
         sB.grille[i][j] = VIDE;
+        sB.grille[i][j - 1] = CACTUS;
     }
     if(bas==WATER)
     {
-        sB.grille[i][j-1]=PLANT;
+        sB.grille[i][j-1]=CACTUS;
         sB.grille[i][j] = VIDE;
-    }
-    if(gauche==WATER)
-    {
-        sB.grille[i-1][j]=PLANT;
-        sB.grille[i][j]= VIDE;
     }
 }
 
@@ -716,9 +718,9 @@ void sbUpdate(sandBox &sB)
                 {
                     sbUpdateAcid(sB,i,j);
                 }
-                else if(sB.grille[i][j]==PLANT)
+                else if(sB.grille[i][j]==CACTUS)
                 {
-                    sbUpdatePlant(sB,i,j);
+                    sbUpdateCACTUS(sB,i,j);
                 }
 
             }
@@ -763,10 +765,12 @@ void draw (sandBox &sB)
                 circleFill(i * tailleX + tailleX / 2, j * tailleY + tailleY / 2,tailleX / 2-2);
                 //image_draw(sB.vortex,i * tailleX + tailleX / 2,j * tailleY + tailleY / 2,20,20);
             }
-            else if(sB.grille[i][j]==PLANT)
+            else if(sB.grille[i][j]==CACTUS)
             {
                 color(24, 199, 42);
                 circleFill(i * tailleX + tailleX / 2, j * tailleY + tailleY / 2,tailleX / 2-2);
+                color(255,255,255);
+                circleFill(i * tailleX + tailleX / 2, j * tailleY + tailleY ,tailleX / 2-2);//epine pour le cactus
             }
 
         }
@@ -785,7 +789,7 @@ int main(int, char **)
     menu_add(menu,"Water");
     menu_add(menu,"Acid");
     menu_add(menu,"Gaz");
-    menu_add(menu,"Plant");
+    menu_add(menu,"Cactus");
     sandBox sB;
     Init(sB);
     bordure(sB);
@@ -831,7 +835,7 @@ int main(int, char **)
                 break;
             case 5:
                 delay(5);
-                type=PLANT;
+                type=CACTUS;
                 break;
 
             }
