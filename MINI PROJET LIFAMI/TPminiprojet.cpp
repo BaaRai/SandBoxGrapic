@@ -1,4 +1,3 @@
-// apps/LIFAMI/TPGameOfLife.cpp
 #include <Grapic.h>
 #include <iostream>
 #include <stdio.h>
@@ -25,8 +24,6 @@ struct sandBox
 {
     int grille[MAX][MAX];
     int dx, dy;
-    Image quitter;
-    Image vortex;
 };
 
 struct vec2
@@ -178,7 +175,6 @@ void Init(sandBox &sB)
             sB.grille[i][j] = VIDE;
         }
     }
-    //sB.vortex=image("data/vortex.png");
 }
 
 
@@ -368,7 +364,17 @@ void sbUpdateWater(sandBox &sB, int i, int j)
         sB.grille[i][j] = VIDE;
         sB.grille[i][j-1]=VIDE;
     }
+    if(gauche==ACID)
+    {
+        sB.grille[i][j] = VIDE;
+        sB.grille[i-1][j]=VIDE;
+    }
+    if(droite==ACID)
+    {
+        sB.grille[i+1][j]=VIDE;
+        sB.grille[i][j] = VIDE;
 
+    }
     else if (centre != VIDE && bas != VIDE)
     {
         //cout<<"test3"<<endl;
@@ -423,7 +429,7 @@ void sbUpdateWater(sandBox &sB, int i, int j)
                 //std::cout<<"ok"<<endl;
                 sB.grille[i][j] = VIDE;
                 sB.grille[i + 1][j - 1] = WATER;
-                }
+            }
         }
         else if (gauche ==  VIDE && droite ==  VIDE )
         {
@@ -439,8 +445,8 @@ void sbUpdateWater(sandBox &sB, int i, int j)
             {
                 sB.grille[i+1][j]=WATER;
                 sB.grille[i][j] = VIDE;
-                //cout<<test;
-                //cout<<"test1"<<endl;
+                //cout<<test1<<endl;
+                //cout<<test<<endl;
             }
             sB.grille[i][j] = VIDE;
         }
@@ -507,8 +513,8 @@ void sbUpdateAcid (sandBox &sB, int i, int j)
     }
     if(bas==SAND)
     {
-         sB.grille[i][j-1]=VIDE;
-         sB.grille[i][j] = ACID;
+        sB.grille[i][j-1]=VIDE;
+        sB.grille[i][j] = ACID;
     }
     if (gauche==SAND)
     {
@@ -520,6 +526,17 @@ void sbUpdateAcid (sandBox &sB, int i, int j)
         sB.grille[i][j] = VIDE;
         sB.grille[i][j-1]=VIDE;
     }
+    if(gauche==WATER)
+    {
+        sB.grille[i][j] = VIDE;
+        sB.grille[i-1][j]=VIDE;
+    }
+    if(droite==WATER)
+    {
+        sB.grille[i+1][j]=VIDE;
+        sB.grille[i][j] = VIDE;
+
+    }
     if(droite==CACTUS)
     {
         sB.grille[i+1][j]=VIDE;
@@ -527,8 +544,8 @@ void sbUpdateAcid (sandBox &sB, int i, int j)
     }
     if(bas==CACTUS)
     {
-         sB.grille[i][j-1]=VIDE;
-         sB.grille[i][j] = VIDE;
+        sB.grille[i][j-1]=VIDE;
+        sB.grille[i][j] = VIDE;
     }
     if (gauche==CACTUS)
     {
@@ -539,6 +556,26 @@ void sbUpdateAcid (sandBox &sB, int i, int j)
     {
         sB.grille[i][j+1]=VIDE;
         sB.grille[i][j] = ACID;
+    }
+    if(haut==GAS)
+    {
+        sB.grille[i][j+1]=VIDE;
+        sB.grille[i][j] = ACID;
+    }
+    if (gauche==GAS)
+    {
+        sB.grille[i-1][j]=VIDE;
+        sB.grille[i][j] = VIDE;
+    }
+    if(droite==GAS)
+    {
+        sB.grille[i+1][j]=VIDE;
+        sB.grille[i][j] = VIDE;
+    }
+    if(bas==GAS)
+    {
+        sB.grille[i][j-1]=VIDE;
+        sB.grille[i][j] = VIDE;
     }
     else if (centre != VIDE && bas != VIDE)
     {
@@ -622,8 +659,6 @@ void sbUpdateAcid (sandBox &sB, int i, int j)
 }
 
 
-const int aleagas=irand(0,8);
-
 void sbUpdateGas(sandBox &sB, int i, int j)
 {
     int hautGauche=sB.grille[i-1][j+1];
@@ -635,22 +670,45 @@ void sbUpdateGas(sandBox &sB, int i, int j)
     int basGauche = sB.grille[i - 1][j - 1];
     int bas = sB.grille[i][j-1];
     int basDroite = sB.grille[i + 1][j - 1];
-    bool verif[3][3];
-    for(int k=0; k<3; k++)
+    int aleagas=irand(0,8);
+    if(hautGauche!=WALL && haut!=WALL && hautDroite!=WALL && gauche!=WALL && droite!=WALL && centre!=WALL ) //pour ne pas "manger" la bordure
     {
-        for (int l=0 ; l<3; l++)
+        if(aleagas==0)
         {
-            verif[k][l]=true;
+            sB.grille[i][j] = VIDE;
+            sB.grille[i-1][j+1] = GAS;
         }
-    }
-    if (centre != VIDE && haut == VIDE)
-    {
-        sB.grille[i][j] = VIDE;
-        sB.grille[i][j + 1] = GAS;
-    }
+        else if(aleagas==1 )
+        {
+            sB.grille[i][j+1]= GAS;
+            sB.grille[i][j]=VIDE;
+        }
+        else if(aleagas==2 )
+        {
+            sB.grille[i+1][j+1]= GAS;
+            sB.grille[i][j]=VIDE;
+        }
+        else if(aleagas==3 )
+        {
+            sB.grille[i-1][j]= GAS;
+            sB.grille[i][j]=VIDE;
+        }
+        else if(aleagas==4 )
+        {
+            sB.grille[i+1][j]= GAS;
+            sB.grille[i][j]=VIDE;
+        }
+        else if(aleagas==5 )
+        {
+            sB.grille[i][j]= GAS;
+        }
 
+    }
 
 }
+
+
+
 
 
 
@@ -722,7 +780,6 @@ void sbUpdate(sandBox &sB)
                 {
                     sbUpdateCACTUS(sB,i,j);
                 }
-
             }
         }
     }
@@ -770,7 +827,7 @@ void draw (sandBox &sB)
                 color(24, 199, 42);
                 circleFill(i * tailleX + tailleX / 2, j * tailleY + tailleY / 2,tailleX / 2-2);
                 color(255,255,255);
-                circleFill(i * tailleX + tailleX / 2, j * tailleY + tailleY ,tailleX / 2-2);//epine pour le cactus
+                circleFill(i * tailleX + tailleX / 2, j * tailleY + tailleY /2,tailleX / 2-4); //epine pour le cactus
             }
 
         }
@@ -794,56 +851,44 @@ int main(int, char **)
     Init(sB);
     bordure(sB);
     int type=SAND;
-    /*int choice;
-    cout<<"0. quit"<<endl;
-    cout<<"1. Play Game"<<endl;
-    cin>>choice;
-    switch(choice)
+    while (!stop)
     {
-    case 0:
-        cout<<"bye"<<endl;
-        break;
-    case 1:*/
-        while (!stop)
+        setKeyRepeatMode(true);
+        winClear();
+        sbUpdate(sB);
+        draw(sB);
+        reset(sB);
+        switch (menu_select(menu) )
         {
-            setKeyRepeatMode(true);
-            winClear();
-            sbUpdate(sB);
-            draw(sB);
-            reset(sB);
-            switch (menu_select(menu) )
-            {
 
-            case 0:
-                type=SAND;
-                //delay(50);
-                break;
-            case 1:
-                type=WALL;
-                //delay(50);
-                break;
-            case 2:
-                type=WATER;
-                //delay(50);
-                break;
-            case 3:
-                type=ACID;
-                //delay(50);
-                break;
-            case 4:
-                type=GAS;
-                break;
-            case 5:
-                delay(5);
-                type=CACTUS;
-                break;
-
-            }
-            gestionSouris(sB,type);
-            menu_draw(menu,5,5,-1,-1);
-            stop = winDisplay();
-        /*}
-        break;*/
+        case 0:
+            type=SAND;
+            //delay(50);
+            break;
+        case 1:
+            type=WALL;
+            //delay(50);
+            break;
+        case 2:
+            type=WATER;
+            //delay(50);
+            break;
+        case 3:
+            type=ACID;
+            //delay(50);
+            break;
+        case 4:
+            //delay(50);
+            type=GAS;
+            break;
+        case 5:
+            //delay(5);
+            type=CACTUS;
+            break;
+        }
+        gestionSouris(sB,type);
+        menu_draw(menu,5,5,-1,-1);
+        stop = winDisplay();
     }
     winQuit();
     return 0;
